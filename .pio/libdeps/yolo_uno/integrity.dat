@@ -1,0 +1,8 @@
+adafruit/DHT sensor library@^1.4.6
+thingsboard/ThingsBoard@^0.15.0
+ArduinoMqttClient
+ESP32Servo
+DHT20
+ArduinoHttpClient
+martinsos/HCSR04@^2.0.0
+ArduinoJson
