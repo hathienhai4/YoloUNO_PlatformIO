@@ -26,6 +26,10 @@ constexpr uint16_t FIRMWARE_PACKET_SIZE = 4096U;
 
 constexpr char WIFI_SSID[] = "HTH";
 constexpr char WIFI_PASSWORD[] = "14062004";
+constexpr char TOKEN[] = "YiqDJ4j5B7VxESqcdra5";
+constexpr char THINGSBOARD_SERVER[] = "app.coreiot.io";
+constexpr char TEMPERATURE_KEY[] = "Temperature";
+constexpr char HUMIDITY_KEY[] = "Humidity";
 
 constexpr uint16_t THINGSBOARD_PORT = 1883U;
 constexpr uint16_t MAX_MESSAGE_SEND_SIZE = 512U;
@@ -44,11 +48,6 @@ constexpr std::array<const char *, 2U> SHARED_ATTRIBUTES_LIST = {
   LED_STATE_ATTR,
   BLINKING_INTERVAL_ATTR
 };
-
-constexpr char TOKEN[] = "YiqDJ4j5B7VxESqcdra5";
-constexpr char THINGSBOARD_SERVER[] = "app.coreiot.io";
-constexpr char TEMPERATURE_KEY[] = "temperature";
-constexpr char HUMIDITY_KEY[] = "humidity";
 
 WiFiClient espClient;
 Arduino_MQTT_Client mqttClient(espClient);
@@ -149,12 +148,10 @@ void ThingsBoardTask(void *pvParameters) {
       Serial.printf("Connecting to: (%s) with token (%s)\n", THINGSBOARD_SERVER, TOKEN);
       if (tb.connect(THINGSBOARD_SERVER, TOKEN, THINGSBOARD_PORT)) {
         Serial.println("Connected to ThingsBoard");
-
         if (!requestedShared) {
           const Attribute_Request_Callback<MAX_ATTRIBUTES> sharedCallback(&processSharedAttributeRequest, REQUEST_TIMEOUT_MICROSECONDS, &requestTimedOut, SHARED_ATTRIBUTES_LIST);
           requestedShared = attr_request.Shared_Attributes_Request(sharedCallback);
         }
-
         if (!shared_update_subscribed) {
           const Shared_Attribute_Callback<MAX_ATTRIBUTES> callback(&processSharedAttributeUpdate, SHARED_ATTRIBUTES_LIST);
           shared_update_subscribed = shared_update.Shared_Attributes_Subscribe(callback);
@@ -165,11 +162,9 @@ void ThingsBoardTask(void *pvParameters) {
         continue;
       }
     }
-
     if (!currentFWSent) {
       currentFWSent = ota.Firmware_Send_Info(CURRENT_FIRMWARE_TITLE, CURRENT_FIRMWARE_VERSION);
     }
-
     if (!updateRequestSent) {
       const OTA_Update_Callback callback(
         CURRENT_FIRMWARE_TITLE, CURRENT_FIRMWARE_VERSION,
@@ -180,10 +175,8 @@ void ThingsBoardTask(void *pvParameters) {
         FIRMWARE_FAILURE_RETRIES,
         FIRMWARE_PACKET_SIZE
       );
-    
       bool started = ota.Start_Firmware_Update(callback);
       bool subscribed = ota.Subscribe_Firmware_Update(callback);
-    
       if (started && subscribed) {
         Serial.println("Firmware Update Started & Subscribed.");
         updateRequestSent = true;
