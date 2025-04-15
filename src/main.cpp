@@ -19,17 +19,14 @@
 #define Ro                                10.0 
 
 constexpr int16_t TELEMETRY_SEND_INTERVAL = 5000U;
-constexpr char CURRENT_FIRMWARE_TITLE[] = "OTA_test";
+constexpr char CURRENT_FIRMWARE_TITLE[] = "OTA_Lab03";
 constexpr char CURRENT_FIRMWARE_VERSION[] = "1.0.1";
 constexpr uint8_t FIRMWARE_FAILURE_RETRIES = 12U;
 constexpr uint16_t FIRMWARE_PACKET_SIZE = 4096U;
 
 constexpr char WIFI_SSID[] = "HTH";
 constexpr char WIFI_PASSWORD[] = "14062004";
-constexpr char TOKEN[] = "YiqDJ4j5B7VxESqcdra5";
-constexpr char THINGSBOARD_SERVER[] = "app.coreiot.io";
-constexpr char TEMPERATURE_KEY[] = "temperature";
-constexpr char HUMIDITY_KEY[] = "humidity";
+
 constexpr uint16_t THINGSBOARD_PORT = 1883U;
 constexpr uint16_t MAX_MESSAGE_SEND_SIZE = 512U;
 constexpr uint16_t MAX_MESSAGE_RECEIVE_SIZE = 512U;
@@ -48,6 +45,11 @@ constexpr std::array<const char *, 2U> SHARED_ATTRIBUTES_LIST = {
   BLINKING_INTERVAL_ATTR
 };
 
+constexpr char TOKEN[] = "YiqDJ4j5B7VxESqcdra5";
+constexpr char THINGSBOARD_SERVER[] = "app.coreiot.io";
+constexpr char TEMPERATURE_KEY[] = "temperature";
+constexpr char HUMIDITY_KEY[] = "humidity";
+
 WiFiClient espClient;
 Arduino_MQTT_Client mqttClient(espClient);
 
@@ -57,7 +59,6 @@ Attribute_Request<2U, MAX_ATTRIBUTES> attr_request;
 const std::array<IAPI_Implementation*, 3U> apis = { &shared_update, &attr_request, &ota };
 ThingsBoard tb(mqttClient, MAX_MESSAGE_RECEIVE_SIZE, MAX_MESSAGE_SEND_SIZE, Default_Max_Stack_Size, apis);
 Espressif_Updater<> updater;
-
 
 volatile bool attributesChanged = false;
 volatile bool ledState = false;
@@ -73,7 +74,7 @@ void processSharedAttributes(const JsonObjectConst &data) {
     const uint16_t new_interval = data[BLINKING_INTERVAL_ATTR].as<uint16_t>();
     if (new_interval >= BLINKING_INTERVAL_MS_MIN && new_interval <= BLINKING_INTERVAL_MS_MAX) {
       blinkingInterval = new_interval;
-      Serial.print("Blinking interval is set to: ");
+      Serial.print("Blinking interval: ");
       Serial.println(new_interval);
     }
   }
@@ -81,7 +82,7 @@ void processSharedAttributes(const JsonObjectConst &data) {
   if (data.containsKey(LED_STATE_ATTR)) {
     ledState = data[LED_STATE_ATTR].as<bool>();
     digitalWrite(LED_PIN, bool(ledState));
-    Serial.print("LED state is set to: ");
+    Serial.print("LED state: ");
     Serial.println(ledState);
   }
 
@@ -199,8 +200,8 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   Serial.begin(SERIAL_DEBUG_BAUD);
   delay(1000);
-  xTaskCreatePinnedToCore(WiFiTask, "WiFiTask", 4096, NULL, 1, NULL, 0);
-  xTaskCreatePinnedToCore(ThingsBoardTask, "TBTask", 8192, NULL, 1, NULL, 1);
+  xTaskCreatePinnedToCore(WiFiTask, "WiFiTask", 8192, NULL, 1, NULL, 0);
+  xTaskCreatePinnedToCore(ThingsBoardTask, "ThingsBoardTask", 8192, NULL, 1, NULL, 1);
 }
 
 void loop() {
