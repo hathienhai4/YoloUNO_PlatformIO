@@ -20,7 +20,7 @@
 
 constexpr int16_t TELEMETRY_SEND_INTERVAL = 5000U;
 constexpr char CURRENT_FIRMWARE_TITLE[] = "OTA_Lab03";
-constexpr char CURRENT_FIRMWARE_VERSION[] = "1.0.1";
+constexpr char CURRENT_FIRMWARE_VERSION[] = "1.0.2";
 constexpr uint8_t FIRMWARE_FAILURE_RETRIES = 12U;
 constexpr uint16_t FIRMWARE_PACKET_SIZE = 4096U;
 
